@@ -2,6 +2,7 @@ package dao;
 
 import db.ConexionDB;
 import model.Cliente;
+import model.Empleado;
 import model.RolUsuario;
 import model.Usuario;
 
@@ -105,6 +106,74 @@ public class UsuarioDAOimpl implements UsuarioDAO {
             return false;
         } finally {
             // 6. VOLVEMOS A DEJAR LA CONEXIÓN EN SU ESTADO ORIGINAL
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println("Error cerrando la conexión: " + e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public boolean registrarEmpleado(Empleado empleado) {
+        String sqlUsuario = "INSERT INTO usuarios (username, password, email, nombre, apellidos, dni, rol) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sqlEmpleado = "INSERT INTO empleados (id_usuario, fecha_contratacion, salario, turno) VALUES (?, ?, ?, ?)";
+        
+        Connection conn = null;
+        
+        try {
+            conn = ConexionDB.getConnection();
+            conn.setAutoCommit(false);
+            
+            int idUsuarioGenerado = -1;
+            
+            try (PreparedStatement pstmtUser = conn.prepareStatement(sqlUsuario, Statement.RETURN_GENERATED_KEYS)) {
+                pstmtUser.setString(1, empleado.getUsername());
+                pstmtUser.setString(2, empleado.getPassword());
+                pstmtUser.setString(3, empleado.getEmail());
+                pstmtUser.setString(4, empleado.getNombre());
+                pstmtUser.setString(5, empleado.getApellidos());
+                pstmtUser.setString(6, empleado.getDni());
+                pstmtUser.setString(7, empleado.getRol().name().toLowerCase());
+                
+                pstmtUser.executeUpdate();
+                
+                try (ResultSet rs = pstmtUser.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        idUsuarioGenerado = rs.getInt(1);
+                    }
+                }
+            }
+            
+            if (idUsuarioGenerado != -1) {
+                try (PreparedStatement pstmtEmp = conn.prepareStatement(sqlEmpleado)) {
+                    pstmtEmp.setInt(1, idUsuarioGenerado);
+                    pstmtEmp.setString(2, empleado.getFechaContratacion());
+                    pstmtEmp.setDouble(3, empleado.getSalario());
+                    pstmtEmp.setString(4, empleado.getTurno());
+                    pstmtEmp.executeUpdate();
+                }
+            } else {
+                throw new SQLException("No se pudo obtener el ID del usuario generado.");
+            }
+            
+            conn.commit();
+            return true;
+            
+        } catch (SQLException e) {
+            System.err.println("Error al registrar empleado. Haciendo ROLLBACK... " + e.getMessage());
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                System.err.println("Error grave en el rollback: " + ex.getMessage());
+            }
+            return false;
+        } finally {
             try {
                 if (conn != null) {
                     conn.setAutoCommit(true);
