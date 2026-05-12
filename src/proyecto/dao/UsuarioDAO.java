@@ -1,5 +1,10 @@
 package dao;
 
-public class UsuarioDAO {
+import model.Usuario;
+import model.Cliente;
 
+public interface UsuarioDAO {
+    Usuario validarLogin(String username, String password);
+
+    boolean registrarCliente (Cliente cliente);
 }

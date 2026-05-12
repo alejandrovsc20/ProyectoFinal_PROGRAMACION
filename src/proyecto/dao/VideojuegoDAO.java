@@ -1,5 +1,14 @@
 package dao;
 
-public class VideojuegoDAO {
+import model.Videojuego;
+import java.util.List;
 
+public interface VideojuegoDAO {
+    boolean insertar(Videojuego videojuego);
+
+    List<Videojuego> listarTodos();
+
+    boolean actualizar(Videojuego videojuego);
+
+    boolean eliminar(int idVideojuego);
 }

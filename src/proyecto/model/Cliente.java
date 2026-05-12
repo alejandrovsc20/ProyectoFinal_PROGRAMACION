@@ -16,6 +16,8 @@ public class Cliente extends Usuario {
         this.plataformaPreferida = plataformaPreferida;
     }
 
+    
+
     public int getPuntosFidelidad() {
         return puntosFidelidad;
     }
@@ -31,7 +33,5 @@ public class Cliente extends Usuario {
     public void setPlataformaPreferida(String plataformaPreferida) {
         this.plataformaPreferida = plataformaPreferida;
     }
-
-    
 
 }
