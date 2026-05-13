@@ -302,5 +302,5 @@ public class Principal extends JFrame {
 
         panelOperaciones.revalidate();
         panelOperaciones.repaint();
-    }  
+    }
 }
