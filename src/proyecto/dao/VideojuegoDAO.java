@@ -11,4 +11,6 @@ public interface VideojuegoDAO {
     boolean actualizar(Videojuego videojuego);
 
     boolean eliminar(int idVideojuego);
+
+    Videojuego buscarPorId(int id);
 }

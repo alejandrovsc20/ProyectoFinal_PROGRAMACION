@@ -96,4 +96,25 @@ public class VideojuegoDAOimpl implements VideojuegoDAO {
             return false;
         }
     }
+
+    @Override
+    public Videojuego buscarPorId(int id) {
+        String sql = "SELECT * FROM videojuegos WHERE id_videojuego = ?";
+        try (Connection conn = ConexionDB.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Videojuego(
+                            rs.getInt("id_videojuego"), rs.getString("titulo"),
+                            rs.getString("genero"), rs.getString("plataforma"),
+                            rs.getDouble("precio"), rs.getInt("stock"),
+                            rs.getBoolean("multijugador"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
