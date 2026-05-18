@@ -89,6 +89,9 @@ public class FormularioRegistro extends JFrame {
         btnRegistrar.setBackground(new Color(39, 174, 96)); // Verde éxito
         btnRegistrar.setForeground(Color.WHITE);
 
+        btnRegistrar.setContentAreaFilled(false);
+        btnRegistrar.setOpaque(true);
+
         btnCancelar = new JButton("Cancelar");
         btnCancelar.setFont(new Font("SansSerif", Font.PLAIN, 14));
 

@@ -57,11 +57,11 @@ public class Principal extends JFrame {
         menuBar.add(menuOpciones);
         setJMenuBar(menuBar);
 
-        // 2. PANEL LATERAL DE NAVEGACIÓN (Estilo Minimalista Oscuro)
+        // 2. PANEL LATERAL DE NAVEGACIÓN (Negro Puro)
         JPanel panelNavegacion = new JPanel();
         panelNavegacion.setLayout(new BoxLayout(panelNavegacion, BoxLayout.Y_AXIS));
         panelNavegacion.setPreferredSize(new Dimension(200, 0));
-        panelNavegacion.setBackground(new Color(43, 48, 58)); // Gris oscuro azulado
+        panelNavegacion.setBackground(Color.BLACK); // <-- FONDO NEGRO APLICADO AQUÍ
         panelNavegacion.setBorder(BorderFactory.createEmptyBorder(30, 10, 20, 10));
 
         JLabel lblLogo = new JLabel("GAME STORE", SwingConstants.CENTER);
@@ -92,7 +92,7 @@ public class Principal extends JFrame {
         modeloTabla = new DefaultTableModel();
         tablaCentral = new JTable(modeloTabla);
         tablaCentral.setDefaultEditor(Object.class, null);
-        tablaCentral.setRowHeight(35); // Filas más altas para leer mejor
+        tablaCentral.setRowHeight(35);
         tablaCentral.setFont(new Font("SansSerif", Font.PLAIN, 14));
         tablaCentral.setSelectionBackground(new Color(200, 220, 240));
 
@@ -122,10 +122,14 @@ public class Principal extends JFrame {
         btn.setMaximumSize(new Dimension(180, 45));
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
         btn.setForeground(Color.WHITE);
-        btn.setBackground(new Color(43, 48, 58)); // Mismo fondo para camuflarse
+        btn.setBackground(Color.BLACK);
+
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(true);
+
         btn.setFont(new Font("SansSerif", Font.PLAIN, 16));
         btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createLineBorder(new Color(60, 65, 75), 1));
+        btn.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
@@ -179,10 +183,14 @@ public class Principal extends JFrame {
             JButton btnGuardar = new JButton("Guardar Nuevo");
             btnGuardar.setBackground(new Color(39, 174, 96));
             btnGuardar.setForeground(Color.WHITE);
+            btnGuardar.setContentAreaFilled(false);
+            btnGuardar.setOpaque(true);
 
             JButton btnEliminar = new JButton("Eliminar Seleccionado");
             btnEliminar.setBackground(new Color(231, 76, 60));
             btnEliminar.setForeground(Color.WHITE);
+            btnEliminar.setContentAreaFilled(false);
+            btnEliminar.setOpaque(true);
 
             btnGuardar.addActionListener(e -> {
                 try {
@@ -196,7 +204,7 @@ public class Principal extends JFrame {
                     if (videojuegoDAO.insertar(v))
                         cargarModuloVideojuegos();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Error en los datos.");
+                    JOptionPane.showMessageDialog(this, "Error en los datos numéricos.");
                 }
             });
 
@@ -264,40 +272,59 @@ public class Principal extends JFrame {
             panelOperaciones.add(Box.createVerticalStrut(5));
             panelOperaciones.add(new JLabel("Cantidad:"));
             panelOperaciones.add(txtCantidad);
-
+            // --- BOTÓN DE NUEVA VENTA ---
             JButton btnNuevaVenta = new JButton("Completar Venta");
             btnNuevaVenta.setBackground(new Color(39, 174, 96));
             btnNuevaVenta.setForeground(Color.WHITE);
+            btnNuevaVenta.setContentAreaFilled(false); // <-- Magia
+            btnNuevaVenta.setOpaque(true); // <-- Magia
 
             btnNuevaVenta.addActionListener(e -> {
                 try {
                     int idCliente = Integer.parseInt(txtIdCliente.getText());
                     int idJuego = Integer.parseInt(txtIdJuego.getText());
                     int cant = Integer.parseInt(txtCantidad.getText());
+
                     Videojuego v = videojuegoDAO.buscarPorId(idJuego);
+
                     if (v != null) {
                         model.Venta nuevaVenta = new model.Venta();
                         nuevaVenta.setIdCliente(idCliente);
                         nuevaVenta.setIdVideojuego(idJuego);
                         nuevaVenta.setCantidad(cant);
                         nuevaVenta.setPrecioHistorico(v.getPrecio());
-                        if (ventaDAO.insertar(nuevaVenta))
+
+                        if (ventaDAO.insertar(nuevaVenta)) {
+                            double total = v.getPrecio() * cant;
+                            JOptionPane.showMessageDialog(this, "Venta registrada.\nTotal a cobrar: " + total + "€");
                             cargarModuloVentas();
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "El ID del videojuego no existe.");
                     }
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(this, "Datos numéricos inválidos.");
                 }
             });
 
+            // --- BOTÓN DE ELIMINAR VENTA ---
             JButton btnEliminar = new JButton("Borrar Venta");
             btnEliminar.setBackground(new Color(231, 76, 60));
             btnEliminar.setForeground(Color.WHITE);
+            btnEliminar.setContentAreaFilled(false); // <-- Magia
+            btnEliminar.setOpaque(true); // <-- Magia
+
             btnEliminar.addActionListener(e -> {
                 int fila = tablaCentral.getSelectedRow();
                 if (fila != -1) {
                     int id = (int) modeloTabla.getValueAt(fila, 0);
-                    if (ventaDAO.eliminar(id))
+                    int confirm = JOptionPane.showConfirmDialog(this, "¿Seguro que quieres borrar esta venta?",
+                            "Confirmar", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION && ventaDAO.eliminar(id)) {
                         cargarModuloVentas();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Selecciona una venta de la tabla.");
                 }
             });
 
@@ -350,15 +377,28 @@ public class Principal extends JFrame {
             panelOperaciones.add(info);
             panelOperaciones.add(Box.createVerticalStrut(25));
 
+            // --- BOTÓN DE ELIMINAR CLIENTE ---
             JButton btnEliminar = new JButton("Dar de baja (Borrar)");
             btnEliminar.setBackground(new Color(231, 76, 60));
             btnEliminar.setForeground(Color.WHITE);
+            btnEliminar.setContentAreaFilled(false); // <-- Magia
+            btnEliminar.setOpaque(true); // <-- Magia
+
             btnEliminar.addActionListener(e -> {
                 int fila = tablaCentral.getSelectedRow();
                 if (fila != -1) {
                     int id = (int) modeloTabla.getValueAt(fila, 0);
-                    if (clienteDAO.eliminar(id))
+                    int confirm = JOptionPane.showConfirmDialog(this,
+                            "¿Seguro que quieres borrar al cliente con ID " + id
+                                    + "?\nSe borrarán también sus ventas asociadas.",
+                            "Confirmar baja", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+                    if (confirm == JOptionPane.YES_OPTION && clienteDAO.eliminar(id)) {
+                        JOptionPane.showMessageDialog(this, "Cliente eliminado correctamente.");
                         cargarModuloClientes();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Selecciona un cliente de la tabla.");
                 }
             });
             panelOperaciones.add(btnEliminar);
