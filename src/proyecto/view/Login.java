@@ -20,40 +20,52 @@ public class Login extends JFrame {
     }
 
     private void initUI() {
-        setTitle("Login - Tienda de Videojuegos");
-        setSize(350, 250);
+        setTitle("Acceso - Tienda de Videojuegos");
+        setSize(400, 350); // Un poco más grande para respirar
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+        setLayout(new BorderLayout());
 
-        JPanel panel = new JPanel(new GridLayout(4, 1, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        // Cabecera Minimalista
+        JLabel lblTitulo = new JLabel("GAME STORE", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 28));
+        lblTitulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        add(lblTitulo, BorderLayout.NORTH);
+
+        // Panel de Formulario
+        JPanel panelForm = new JPanel(new GridLayout(4, 1, 10, 15));
+        panelForm.setBorder(BorderFactory.createEmptyBorder(10, 40, 20, 40));
 
         txtUsername = new JTextField();
         txtUsername.setBorder(BorderFactory.createTitledBorder("Usuario"));
+        txtUsername.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
         txtPassword = new JPasswordField();
         txtPassword.setBorder(BorderFactory.createTitledBorder("Contraseña"));
+        txtPassword.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
         btnEntrar = new JButton("Entrar");
+        btnEntrar.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnEntrar.setBackground(new Color(41, 128, 185)); // Azul elegante
+        btnEntrar.setForeground(Color.WHITE);
+
         btnIrRegistro = new JButton("¿No tienes cuenta? Regístrate");
         btnIrRegistro.setContentAreaFilled(false);
         btnIrRegistro.setBorderPainted(false);
-        btnIrRegistro.setForeground(Color.BLUE);
+        btnIrRegistro.setForeground(new Color(41, 128, 185));
+        btnIrRegistro.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        panel.add(txtUsername);
-        panel.add(txtPassword);
-        panel.add(btnEntrar);
-        panel.add(btnIrRegistro);
+        panelForm.add(txtUsername);
+        panelForm.add(txtPassword);
+        panelForm.add(btnEntrar);
+        panelForm.add(btnIrRegistro);
 
-        add(panel);
+        add(panelForm, BorderLayout.CENTER);
 
         // Eventos
         btnEntrar.addActionListener(e -> accionLogin());
-
-        btnIrRegistro.addActionListener(e -> {
-            new FormularioRegistro().setVisible(true);
-        });
+        btnIrRegistro.addActionListener(e -> new FormularioRegistro().setVisible(true));
     }
 
     private void accionLogin() {
@@ -63,12 +75,11 @@ public class Login extends JFrame {
         Usuario u = usuarioDAO.validarLogin(user, pass);
 
         if (u != null) {
-            JOptionPane.showMessageDialog(this, "Bienvenido " + u.getNombre());
-            // DESCOMENTAR ESTAS DOS LÍNEAS:
             new Principal(u).setVisible(true);
-            this.dispose(); // Cierra el login
+            this.dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Error de Acceso",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 }

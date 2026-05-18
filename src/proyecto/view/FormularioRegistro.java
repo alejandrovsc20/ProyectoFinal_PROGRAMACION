@@ -12,75 +12,69 @@ import java.awt.*;
 
 public class FormularioRegistro extends JFrame {
 
-    // Componentes comunes
     private JTextField txtUsername, txtEmail, txtNombre, txtApellidos, txtDni;
     private JPasswordField txtPassword;
     private JComboBox<RolUsuario> cmbRol;
-
-    // Componentes específicos de Cliente
     private JTextField txtPuntos, txtPlataforma;
     private JPanel panelCliente;
-
-    // Componentes específicos de Empleado
     private JTextField txtFecha, txtSalario, txtTurno;
     private JPanel panelEmpleado;
-
     private JButton btnRegistrar, btnCancelar;
-
-    // Capa de datos (DAO)
     private UsuarioDAO usuarioDAO;
 
     public FormularioRegistro() {
-        usuarioDAO = new UsuarioDAOimpl(); // Instanciamos el DAO
+        usuarioDAO = new UsuarioDAOimpl();
         initUI();
     }
 
     private void initUI() {
-        setTitle("Registro de Usuario - Tienda de Videojuegos");
-        setSize(450, 650);
+        setTitle("Nuevo Registro");
+        setSize(500, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout());
 
-        // PANEL PRINCIPAL (Scrollable por si hay muchos campos)
+        JLabel lblTitulo = new JLabel("CREAR CUENTA", SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        lblTitulo.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+        add(lblTitulo, BorderLayout.NORTH);
+
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
 
-        // --- SECCIÓN COMÚN ---
-        mainPanel.add(crearFila("Nombre de Usuario:", txtUsername = new JTextField()));
+        mainPanel.add(crearFila("Usuario:", txtUsername = new JTextField()));
         mainPanel.add(crearFila("Contraseña:", txtPassword = new JPasswordField()));
         mainPanel.add(crearFila("Email:", txtEmail = new JTextField()));
         mainPanel.add(crearFila("Nombre:", txtNombre = new JTextField()));
         mainPanel.add(crearFila("Apellidos:", txtApellidos = new JTextField()));
         mainPanel.add(crearFila("DNI:", txtDni = new JTextField()));
 
-        // --- SELECCIÓN DE ROL (Dinámico) ---
-        JPanel pnlRol = new JPanel(new GridLayout(1, 2));
-        pnlRol.add(new JLabel("Tipo de Usuario:"));
+        JPanel pnlRol = new JPanel(new GridLayout(1, 2, 10, 10));
+        JLabel lblRol = new JLabel("Tipo de Usuario:");
+        lblRol.setFont(new Font("SansSerif", Font.BOLD, 12));
+        pnlRol.add(lblRol);
         cmbRol = new JComboBox<>(RolUsuario.values());
         pnlRol.add(cmbRol);
+        pnlRol.setMaximumSize(new Dimension(500, 35));
         mainPanel.add(pnlRol);
-        mainPanel.add(Box.createVerticalStrut(15));
+        mainPanel.add(Box.createVerticalStrut(20));
 
-        // --- PANEL ESPECÍFICO CLIENTE ---
         panelCliente = new JPanel();
         panelCliente.setLayout(new BoxLayout(panelCliente, BoxLayout.Y_AXIS));
         panelCliente.add(crearFila("Puntos Iniciales:", txtPuntos = new JTextField("0")));
         panelCliente.add(crearFila("Plataforma Favorita:", txtPlataforma = new JTextField()));
 
-        // --- PANEL ESPECÍFICO EMPLEADO ---
         panelEmpleado = new JPanel();
         panelEmpleado.setLayout(new BoxLayout(panelEmpleado, BoxLayout.Y_AXIS));
         panelEmpleado.add(crearFila("Fecha Contrat. (YYYY-MM-DD):", txtFecha = new JTextField()));
         panelEmpleado.add(crearFila("Salario Mensual:", txtSalario = new JTextField()));
         panelEmpleado.add(crearFila("Turno (Mañana/Tarde):", txtTurno = new JTextField()));
-        panelEmpleado.setVisible(false); // Oculto al inicio
+        panelEmpleado.setVisible(false);
 
         mainPanel.add(panelCliente);
         mainPanel.add(panelEmpleado);
 
-        // LÓGICA DINÁMICA: Mostrar/Ocultar campos según el rol
         cmbRol.addActionListener(e -> {
             boolean esCliente = cmbRol.getSelectedItem() == RolUsuario.CLIENTE;
             panelCliente.setVisible(esCliente);
@@ -89,33 +83,41 @@ public class FormularioRegistro extends JFrame {
             this.repaint();
         });
 
-        // --- BOTONES ---
-        JPanel pnlBotones = new JPanel();
+        JPanel pnlBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
         btnRegistrar = new JButton("Registrar Usuario");
+        btnRegistrar.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnRegistrar.setBackground(new Color(39, 174, 96)); // Verde éxito
+        btnRegistrar.setForeground(Color.WHITE);
+
         btnCancelar = new JButton("Cancelar");
+        btnCancelar.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
         pnlBotones.add(btnRegistrar);
         pnlBotones.add(btnCancelar);
 
         add(new JScrollPane(mainPanel), BorderLayout.CENTER);
         add(pnlBotones, BorderLayout.SOUTH);
 
-        // EVENTO DEL BOTÓN REGISTRAR
         btnRegistrar.addActionListener(e -> accionRegistrar());
         btnCancelar.addActionListener(e -> dispose());
     }
 
     private JPanel crearFila(String etiqueta, JComponent comp) {
-        JPanel p = new JPanel(new GridLayout(1, 2, 5, 5));
-        p.add(new JLabel(etiqueta));
+        JPanel p = new JPanel(new GridLayout(1, 2, 10, 10));
+        JLabel lbl = new JLabel(etiqueta);
+        lbl.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        if (comp instanceof JTextField)
+            ((JTextField) comp).setFont(new Font("SansSerif", Font.PLAIN, 13));
+        p.add(lbl);
         p.add(comp);
-        p.setMaximumSize(new Dimension(400, 30));
+        p.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        p.setMaximumSize(new Dimension(500, 40));
         return p;
     }
 
     private void accionRegistrar() {
         RolUsuario rol = (RolUsuario) cmbRol.getSelectedItem();
         boolean exito = false;
-
         try {
             if (rol == RolUsuario.CLIENTE) {
                 Cliente c = new Cliente();
@@ -133,12 +135,10 @@ public class FormularioRegistro extends JFrame {
             }
 
             if (exito) {
-                JOptionPane.showMessageDialog(this, "¡Usuario registrado con éxito!", "Éxito",
-                        JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "¡Usuario registrado con éxito!");
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Error al registrar. Revisa el log o los datos.", "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error al registrar.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error en los datos: " + ex.getMessage());
