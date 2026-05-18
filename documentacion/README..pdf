@@ -1,5 +1,4 @@
 Proyecto Final Programación: GameStore Management
-Módulo: Programación · 2º DAM
 
 Centro: IES Francisco Ayala - Granada
 
