@@ -160,8 +160,15 @@ public class Principal extends JFrame {
 
         if (usuarioActual.getRol() == model.RolUsuario.EMPLEADO) {
             JTextField txtTitulo = new JTextField();
-            JTextField txtGenero = new JTextField();
-            JTextField txtPlat = new JTextField();
+            // Definimos las opciones que queremos que salgan en los desplegables
+            String[] opcionesGenero = { "Acción", "Aventura", "RPG", "Deportes", "Shooter", "Estrategia", "Lucha",
+                    "Plataformas", "Terror" };
+            String[] opcionesPlataforma = { "PC", "PS5", "PS4", "Xbox Series X/S", "Xbox One", "Nintendo Switch" };
+            JComboBox<String> cmbGenero = new JComboBox<>(opcionesGenero);
+            JComboBox<String> cmbPlataforma = new JComboBox<>(opcionesPlataforma);
+            cmbGenero.setForeground(Color.BLACK);
+            cmbPlataforma.setForeground(Color.BLACK);
+
             JTextField txtPrecio = new JTextField();
             JTextField txtStock = new JTextField();
 
@@ -169,10 +176,10 @@ public class Principal extends JFrame {
             panelOperaciones.add(txtTitulo);
             panelOperaciones.add(Box.createVerticalStrut(5));
             panelOperaciones.add(new JLabel("Género:"));
-            panelOperaciones.add(txtGenero);
+            panelOperaciones.add(cmbGenero);
             panelOperaciones.add(Box.createVerticalStrut(5));
             panelOperaciones.add(new JLabel("Plataforma:"));
-            panelOperaciones.add(txtPlat);
+            panelOperaciones.add(cmbPlataforma);
             panelOperaciones.add(Box.createVerticalStrut(5));
             panelOperaciones.add(new JLabel("Precio:"));
             panelOperaciones.add(txtPrecio);
@@ -196,8 +203,8 @@ public class Principal extends JFrame {
                 try {
                     Videojuego v = new Videojuego();
                     v.setTitulo(txtTitulo.getText());
-                    v.setGenero(txtGenero.getText());
-                    v.setPlataforma(txtPlat.getText());
+                    v.setGenero(cmbGenero.getSelectedItem().toString());
+                    v.setPlataforma(cmbPlataforma.getSelectedItem().toString());
                     v.setPrecio(Double.parseDouble(txtPrecio.getText()));
                     v.setStock(Integer.parseInt(txtStock.getText()));
                     v.setMultijugador(false);
